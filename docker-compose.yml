@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   db:
-    image: mongo:latest
+    build:
+      context: ./mongo
+      dockerfile: Dockerfile
     container_name: mongo_db
     restart: always
     ports: 
@@ -34,3 +36,4 @@ networks:
 
 volumes:
   mongo_data:
+

@@ -39,11 +39,11 @@ echo '
         }
 
         .success {
-            color: #16a34a;
+            color: #99d6b0ff;
         }
 
         .error {
-            color: #dc2626;
+            color: #dd6b6bff;
         }
         
         h2 .icon {

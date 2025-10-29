@@ -149,7 +149,7 @@
         <input type="text" name="prendas_armario" placeholder="IDs prendas (coma)">
         <input type="text" name="seguidores" placeholder="IDs seguidores (coma)">
         <input type="text" name="siguiendo" placeholder="IDs siguiendo (coma)">
-        <button type="submit">Agregar Usuario</button>
+        <button type="submit">Agregar</button>
     </form>
 </div>
 

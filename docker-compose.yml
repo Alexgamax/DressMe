@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo:latest
+    container_name: mongo_db
+    restart: always
+    ports: 
+      - "27130:27017"
+    volumes: 
+      - mongo_data:/data/db
+      - ./mongo/init:/docker-entrypoint-initdb.d:ro
+    environment:
+      - MONGO_INITDB_DATABASE=DBProyecto
+    networks:
+      - appnet
+
+  php:
+    build: ./php
+    container_name: php_app
+    ports: 
+      - "8000:80"
+    volumes:
+      - ./php/src:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - MONGO_URI=mongodb://db:27017
+    networks:
+      - appnet
+
+networks:
+  appnet:
+
+volumes:
+  mongo_data:

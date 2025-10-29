@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-include '../db.php';
+include 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -9,22 +9,39 @@ if (!isset($data['nombre']) || !isset($data['email']) || !isset($data['password'
     exit;
 }
 
-$collection = $db->usuarios;
+//arrays de IDs a ObjectId
+function toObjectIdArray($arr){
+    $result = [];
+    foreach($arr as $id){
+        try {
+            $result[] = new MongoDB\BSON\ObjectId($id);
+        } catch(Exception $e){
+        }
+    }
+    return $result;
+}
 
-$nuevo = [
+$documento = [
     "nombre" => $data['nombre'],
     "email" => $data['email'],
     "password" => $data['password'],
     "genero" => $data['genero'] ?? '',
     "estilos_preferidos" => $data['estilos_preferidos'] ?? [],
-    "prendas_armario" => array_map(function($id){ return new MongoDB\BSON\ObjectId($id); }, $data['prendas_armario'] ?? []),
+    "prendas_armario" => toObjectIdArray($data['prendas_armario'] ?? []),
     "fecha_registro" => new MongoDB\BSON\UTCDateTime(),
-    "seguidores" => array_map(function($id){ return new MongoDB\BSON\ObjectId($id); }, $data['seguidores'] ?? []),
-    "siguiendo" => array_map(function($id){ return new MongoDB\BSON\ObjectId($id); }, $data['siguiendo'] ?? [])
+    "seguidores" => toObjectIdArray($data['seguidores'] ?? []),
+    "siguiendo" => toObjectIdArray($data['siguiendo'] ?? [])
 ];
 
-$result = $collection->insertOne($nuevo);
+$bulk = new MongoDB\Driver\BulkWrite;
+$id = $bulk->insert($documento);
 
-echo json_encode(["inserted_id" => (string)$result->getInsertedId()]);
+try {
+    $manager->executeBulkWrite('DBProyecto.usuarios', $bulk);
+    echo json_encode(["inserted_id" => (string)$id]);
+} catch (Exception $e){
+    echo json_encode(["error" => $e->getMessage()]);
+}
 ?>
+
 

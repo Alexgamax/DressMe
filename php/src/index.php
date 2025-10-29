@@ -5,7 +5,11 @@
 <meta charset="UTF-8">
 <title>CRUD Usuarios</title>
 <style>
-body{font-family:Arial;margin:20px;} table{border-collapse:collapse;width:100%;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#f4f4f4;} input,button{padding:6px;margin:3px;}
+body{font-family:Arial;margin:20px;} 
+table{border-collapse:collapse;width:100%;margin-top:20px;} 
+th,td{border:1px solid #ccc;padding:8px;text-align:left;} 
+th{background:#f4f4f4;} 
+input,button{padding:6px;margin:3px;}
 </style>
 </head>
 <body>
@@ -50,25 +54,39 @@ async function cargarUsuarios(){
             <td>${u.seguidores.join(', ')||'-'}</td>
             <td>${u.siguiendo.join(', ')||'-'}</td>
             <td>${u.fecha_registro||'-'}</td>
-            <td><button onclick="eliminarUsuario('${u._id}')">Eliminar</button></td>
+            <td>
+                <button onclick="eliminarUsuario('${u._id}')">Eliminar</button>
+                <button onclick="editarUsuario('${u._id}')">Editar</button>
+            </td>
         </tr>`;
     });
 }
 
 async function eliminarUsuario(id){
     if(!confirm('¿Eliminar este usuario?')) return;
-    await fetch(`delete.php?id=${id}`);
+    await fetch('delete.php?id='+id);
     cargarUsuarios();
+}
+
+function editarUsuario(id){
+    const nombre = prompt('Nuevo nombre:');
+    if(nombre){
+        fetch('update.php',{
+            method:'PUT',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({id,nombre})
+        }).then(()=> cargarUsuarios());
+    }
 }
 
 document.querySelector('#formAgregar').addEventListener('submit', async e=>{
     e.preventDefault();
     const form = e.target;
     const data = Object.fromEntries(new FormData(form));
-    // convertir inputs separados por coma a array
     ['estilos_preferidos','prendas_armario','seguidores','siguiendo'].forEach(k=>{
         if(data[k]) data[k] = data[k].split(',').map(i=>i.trim());
     });
+
     await fetch('create.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
